@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { groupsGetAll } from '@storage/group/groupsGetAll';
 
 import { Header } from '@components/Header';
 import { HighLight } from '@components/HightLight';
@@ -18,13 +19,36 @@ export function Groups() {
         navigation.navigate('new');
     }
 
+    async function fetchGroup() {
+        try {
+
+            const data = await groupsGetAll();
+            setGroups(data);
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+    }
+
+    function handleOpenGroup(group: string) {
+
+        navigation.navigate('players', { group });
+
+    }
+
+    useFocusEffect(useCallback(() => {
+        fetchGroup();
+    }, []));
+
     return (
         <Container>
             <Header />
 
             <HighLight 
                 title='Turmas'
-                subtitle='jogue com a sua turma'
+                subtitle='Jogue com a sua turma'
             />
 
             <FlatList
@@ -33,6 +57,7 @@ export function Groups() {
                 renderItem={({ item }) => (
                     <GroupCard 
                         title={item}
+                        onPress={() => handleOpenGroup(item)}
                     />                    
                 )}
                 contentContainerStyle={
@@ -43,7 +68,7 @@ export function Groups() {
                 }
                 ListEmptyComponent={() => (
                     <ListEmpty 
-                        message="Nenhum grupo cadastrado!"  
+                        message="Nenhuma turma cadastrada!"  
                     />
                 )}
                 showsVerticalScrollIndicator={false}
