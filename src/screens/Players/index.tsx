@@ -5,6 +5,8 @@ import { FlatList, Alert, TextInput } from "react-native";
 import { AppError } from "@utils/AppError";
 
 import { playerAddByGroup } from "@storage/player/playerAddByGroup";
+import { PlayerStorageDTO } from "@storage/player/PlayerStorageDTO";
+import { playerRemoveByGroup } from "@storage/player/playerRemove ByGroup";
 import { playersGetByGroupAndTeam } from "@storage/player/playerGetByGroupAndTeam";
 
 import { Header } from "@components/Header";
@@ -17,7 +19,6 @@ import { ListEmpty } from "@components/ListEmpty";
 
 import { Container, Form, HeaderList, NumberOfPlayers } from "./styles";
 import { Button } from "@components/Button";
-import { PlayerStorageDTO } from "@storage/player/PlayerStorageDTO";
 
 type RouteParams = {
     group: string;
@@ -77,6 +78,19 @@ export function Players() {
         }
 
         
+    }
+
+    async function handlePlayerRemove(playerName: string) {
+        try {
+
+            await playerRemoveByGroup(playerName, group);
+            fetchPlayersByTeam();
+            
+        } catch (error) {
+            
+            console.log(error);
+            Alert.alert('Remover pessoa', 'Não foi prossível remover esta pessoa!');
+        }
     }
 
     useEffect(() => {
